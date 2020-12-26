@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"math/bits"
+	"strings"
 )
 
 func ScoreStr1(InputStr string) float32 {
@@ -118,7 +119,7 @@ func GetKeyText(KeyLength int, text string) string{
 
 func main(){
 
-	file, err := ioutil.ReadFile("task6.txt")
+	/*file, err := ioutil.ReadFile("task6.txt")
 
 	if err != nil {
 		log.Fatal(err)
@@ -139,5 +140,30 @@ func main(){
 	for i := 0; i < len(text); i++ {
 		result = append(result, KeyVal[i % len(KeyVal)] ^ text[i])
 	}
+	fmt.Println(string(result))*/
+	file, err := ioutil.ReadFile("task6.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	text := strings.Split(string(file), "\n")
+
+	var text_file string
+	for i := 0; i < len(text); i++ {
+		text_file += strings.TrimSpace(text[i])
+	}
+
+	byteFileText, err1 := base64.StdEncoding.DecodeString(text_file)
+	if err1 != nil {
+		log.Fatal(err1)
+	}
+
+	KeyValue := GetKeyText(GetLenKey(string(byteFileText)), string(byteFileText))
+
+	var result []byte
+	for i := 0; i < len(byteFileText); i++ {
+		result = append(result, KeyValue[i%len(KeyValue)]^byteFileText[i])
+	}
+
 	fmt.Println(string(result))
 }
+
