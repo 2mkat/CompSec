@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Try to win!</title>
+</head>
+<style>
+    * {
+        padding: 0;
+        margin: 0;
+    }
+
+    body,
+    html {
+        height: 100vh;
+        width: 100wv;
+    }
+
+    #page {
+        height: 100%;
+        width: 100%;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: row;
+        flex-direction: row;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        background-color: white;
+    }
+
+    .cell {
+        float: left;
+        width: 20px;
+        height: 20px;
+        border: 0.1px solid black;
+        background-color: white;
+    }
+    /*# sourceMappingURL=style.css.map */
+</style>
+<script>
+    let nStep = 0;
+    let nWillage = {{.WillageCount}};
+    let fieldSize = {{.FieldSize}};
+    let fieldArr = {{.Map}};
+
+    let field = "";
+    let cellColorState = {
+        free: "white",
+        user: "red",
+        willage: "blue"
+    };
+</script>
+<body>
+<section id="page">
+    <main id="game">
+        <script>
+
+            for (let i = 0; i < 32; ++i) {
+                for (let j = 0; j < 32; ++j) {
+                    let index = i*32 + j
+                    field += '<div class="cell" id="' + index + '" style="background-color:';
+                    if (fieldArr[index] == 1) {
+                        field += cellColorState.willage;
+                    }else if (fieldArr[index] == 2) {
+                        field += cellColorState.user;
+                    }else {
+                        field += cellColorState.free;
+                    }
+                    field += ';"></div>';
+                }
+                field += '</br>';
+            }
+            game.innerHTML = field;
+        </script>
+    </main>
+    <aside id="score"></aside>
+</section>
+</body>
+<script>
+    let cell = document.getElementsByClassName("cell");
+    let scoreBoard = document.getElementById("score");
+    let game = document.getElementById("game");
+
+    function updateScores(newScores) {
+        scoreBoard.innerHTML = newScores;
+    }
+
+    function isUsed(target) {
+        return target.style.backgroundColor == cellColorState.user;
+    }
+
+    function isCaptured(target) {
+        return target.style.backgroundColor == cellColorState.user;
+    }
+
+    function isWillage(target) {
+        return target.style.backgroundColor == cellColorState.willage;
+    }
+
+    function captureCell(target) {
+        target.style.backgroundColor = cellColorState.user;
+    }
+
+    function checkNear(index) {
+        return index % 32 != 0 && isCaptured(cell[index - 1]) ||
+            (index + 1) % 32 != 0 && isCaptured(cell[index + 1]) ||
+            index >= 32 && isCaptured(cell[index - fieldSize]) ||
+            index <= (fieldSize*(fieldSize - 1)) && isCaptured(cell[index + fieldSize]);
+    }
+
+    function cellClick(e) {
+        index = Number(e.target.id);
+        if (!isUsed(e.target) && checkNear(index)) {
+            if (isWillage(cell[index])) {
+                --nWillage;
+            }
+            updateScores(++nStep);
+            captureCell(e.target);
+            if (nWillage == 0) {
+                alert("You win!\nYour scores: " + nStep);
+            }
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", ()=>{
+        updateScores(0);
+        for (i = 0; i < cell.length; ++i) {
+            cell[i].onclick = cellClick;
+        }
+    });
+</script>
+</html>
